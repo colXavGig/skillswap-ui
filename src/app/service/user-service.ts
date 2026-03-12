@@ -1,8 +1,18 @@
 import { inject, Injectable } from '@angular/core';
 import { ApiClient, ApiError } from '../http/api-client';
 import { catchError, Observable, throwError } from 'rxjs';
-import { UserModel } from '../model/user';
 import { UserNotFoundError } from './user-errors';
+
+export interface User {
+  id: number;
+  name: string;
+  username: string;
+  email?: string;
+  bio: string;
+  skills: string[];
+  rating_avg: number | null;
+  completed_jobs: number;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -11,8 +21,8 @@ export class UserService {
   readonly #BASE_ENDPOINT = '/users';
   readonly #apiClient: ApiClient = inject(ApiClient);
 
-  getMe(): Observable<UserModel> {
-    return this.#apiClient.get<UserModel>(`${this.#BASE_ENDPOINT}/me`).pipe(
+  getMe(): Observable<User> {
+    return this.#apiClient.get<User>(`${this.#BASE_ENDPOINT}/me`).pipe(
       catchError((err: ApiError) => {
         if (err.status === 404) {
           throw new UserNotFoundError(err.error);
@@ -22,9 +32,9 @@ export class UserService {
     );
   }
 
-  getUserByUsername(username: string): Observable<UserModel> {
+  getUserByUsername(username: string): Observable<User> {
     return this.#apiClient
-      .get<UserModel>(`${this.#BASE_ENDPOINT}/${username}`)
+      .get<User>(`${this.#BASE_ENDPOINT}/${username}`)
       .pipe(
         catchError((err: ApiError) => {
           if (err.status === 404) {
