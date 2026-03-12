@@ -1,7 +1,11 @@
 import { readonly } from "@angular/forms/signals";
 import { UserModel } from "../model/user";
+import { Injectable } from "@angular/core";
 
 
+@Injectable({
+    providedIn: 'root'
+})
 export class AuthStore {
 
     readonly #USER_KEY = 'skillswap-connected-user'
