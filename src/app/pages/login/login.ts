@@ -31,7 +31,12 @@ export class LoginComponent implements OnInit {
     this.#route.queryParams.subscribe(params => {
       this.error.set(params['error'] || null);
     });
+
+    this.form.valueChanges.subscribe(() => {
+      this.error.set(null);
+    })
   }
+
 
   onSubmit() {
     if (this.form.invalid) {
