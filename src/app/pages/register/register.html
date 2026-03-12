@@ -1,0 +1,42 @@
+<div class="register-container">
+  <h2>Create your SkillSwap account</h2>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="name">Name</label>
+      <input id="name" formControlName="name" placeholder="Your full name">
+    </div>
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input id="username" formControlName="username" placeholder="Choose a username">
+    </div>
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input id="email" type="email" formControlName="email" placeholder="Your email address">
+    </div>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input id="password" type="password" formControlName="password" placeholder="Create a password">
+    </div>
+    <div class="form-group">
+      <label for="bio">Bio</label>
+      <textarea id="bio" formControlName="bio" placeholder="Tell us about yourself"></textarea>
+    </div>
+    <div class="form-group">
+      <label for="skills">Skills</label>
+      <input id="skills" formControlName="skills" placeholder="Comma-separated skills (e.g., Angular, NodeJS, UX Design)">
+    </div>
+
+    @if (error()) {
+      <div class="error-message">
+        {{ error() }}
+        @if (suggestedUsername()) {
+          <div>
+            Suggested username: {{ suggestedUsername() }}
+          </div>
+        }
+      </div>
+    }
+
+    <button type="submit" [disabled]="form.invalid">Register</button>
+  </form>
+</div>
