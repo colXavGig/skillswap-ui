@@ -53,7 +53,7 @@ export class LoginComponent implements OnInit {
         next: (response) => {
           if (response) {
             this.#authStore.saveSession(response.user, response.token);
-            const returnUrl = this.#route.snapshot.queryParams['returnUrl'] || '/';
+            const returnUrl = this.#route.snapshot.queryParams['returnUrl'] || '/profile/me';
             this.#router.navigateByUrl(returnUrl);
           }
         },
