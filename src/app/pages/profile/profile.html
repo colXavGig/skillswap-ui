@@ -1,0 +1,45 @@
+<div class="profile-container">
+  @if (isLoading()) {
+    <p class="loading">Loading profile...</p>
+  }
+
+  @if (error()) {
+    <p class="error-message">{{ error() }}</p>
+  }
+
+  @if (user(); as userData) {
+    <div class="profile-card">
+      <header class="profile-header">
+        <h1 class="user-name">{{ userData.name }}</h1>
+        <p class="user-username">@{{ userData.username }}</p>
+      </header>
+
+      <section class="profile-body">
+        <div class="bio-section">
+          <h2>About Me</h2>
+          <p>{{ userData.bio }}</p>
+        </div>
+
+        <div class="skills-section">
+          <h2>Skills</h2>
+          <ul class="skills-list">
+            @for (skill of userData.skills; track skill) {
+              <li class="skill-tag">{{ skill }}</li>
+            }
+          </ul>
+        </div>
+      </section>
+
+      <footer class="profile-footer">
+        <div class="stat-item">
+          <span class="stat-value">{{ userData.rating_avg?.toFixed(1) ?? 'N/A' }}</span>
+          <span class="stat-label">Avg. Rating</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">{{ userData.completed_jobs }}</span>
+          <span class="stat-label">Jobs Completed</span>
+        </div>
+      </footer>
+    </div>
+  }
+</div>

@@ -1,0 +1,122 @@
+:host {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem;
+  min-height: 100vh;
+  background-color: #f4f7f9;
+  font-family: 'Inter', sans-serif;
+}
+
+.profile-container {
+  width: 100%;
+  max-width: 800px;
+}
+
+.loading, .error-message {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #555;
+  padding: 3rem;
+}
+
+.error-message {
+  color: #d9534f;
+}
+
+.profile-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  border: 1px solid #e9ecef;
+}
+
+.profile-header {
+  padding: 2rem;
+  text-align: center;
+  border-bottom: 1px solid #e9ecef;
+  background: linear-gradient(45deg, #007bff, #0056b3);
+  color: white;
+
+  .user-name {
+    margin: 0 0 0.25rem;
+    font-size: 2.5rem;
+    font-weight: 600;
+  }
+
+  .user-username {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 300;
+    opacity: 0.8;
+  }
+}
+
+.profile-body {
+  padding: 2rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+
+  h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #343a40;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 0.5rem;
+  }
+}
+
+.skills-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.skill-tag {
+  background-color: #e9ecef;
+  color: #495057;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    background-color: #007bff;
+    color: white;
+  }
+}
+
+.profile-footer {
+  display: flex;
+  justify-content: space-around;
+  padding: 1.5rem 2rem;
+  background-color: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #007bff;
+  }
+
+  .stat-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
