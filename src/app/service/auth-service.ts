@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { ApiClient, ApiError } from '../http/api-client';
 import { catchError, Observable, tap, throwError } from 'rxjs';
-import { UserModel } from '../model/user';
+import { User } from './user-service';
 import { AuthStore } from '../auth/auth-store';
 import {
   EmailAlreadyInUseError,
@@ -28,12 +28,12 @@ export interface RegisterRequest {
 
 export interface AuthResponse {
   token: string;
-  user: UserModel;
+  user: User;
 }
 
 export interface RegisterResponse {
   message: string;
-  user: UserModel;
+  user: User;
 }
 
 @Injectable({

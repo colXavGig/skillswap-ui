@@ -1,6 +1,5 @@
-import { readonly } from "@angular/forms/signals";
-import { UserModel } from "../model/user";
 import { Injectable } from "@angular/core";
+import { User } from "../service/user-service";
 
 
 @Injectable({
@@ -12,7 +11,7 @@ export class AuthStore {
     readonly #TOKEN_KEY = 'skillswap-token'
 
 
-    get user(): UserModel|null {
+    get user(): User|null {
         const data = localStorage.getItem(this.#USER_KEY)
         if (!data) {
             return null
@@ -20,7 +19,7 @@ export class AuthStore {
         return JSON.parse(data)
     }
 
-    set #user(user: UserModel|null) {
+    set #user(user: User|null) {
         if (!user) {
             localStorage.removeItem(this.#USER_KEY)
             return
@@ -40,7 +39,7 @@ export class AuthStore {
         localStorage.setItem(this.#TOKEN_KEY, token)
     }
 
-    saveSession(user: UserModel, token: string) {
+    saveSession(user: User, token: string) {
         this.#user = user
         this.#token = token
     }
