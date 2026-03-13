@@ -75,13 +75,13 @@ export class JobService {
     }
 
     return this.#apiClient.post<void>(`${this.#BASE_ENDPOINT}`, job)
-88    .pipe(
+    .pipe(
       catchError((err: ApiError) => {
         if (err.status === 400) {
           throw new MissingRequiredFieldsError(err.error);
         }
         return throwError(() => err);
-      }),
+      })
     );
   }
 
