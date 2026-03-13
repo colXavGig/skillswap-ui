@@ -81,7 +81,7 @@ export class AuthService {
               throw new EmailAlreadyInUseError(err.error);
             }
             if (err.error === 'Username already in use') {
-              throw new UsernameAlreadyInUseError(err as any);
+              throw new UsernameAlreadyInUseError(err);
             }
           }
           return throwError(() => err);

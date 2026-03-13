@@ -64,6 +64,7 @@ export class ApiError extends Error implements ApiErrorResponse {
     super(resp.error);
     this.error = resp.error;
     this.status = status;
+    this.suggested_username = (resp as any).suggested_username;
   }
 
 }
