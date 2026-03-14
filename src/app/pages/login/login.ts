@@ -21,6 +21,8 @@ export class LoginComponent implements OnInit {
   readonly #authStore = inject(AuthStore);
 
   error = signal<string | null>(null);
+  returnUrl: string = '/profile/me';
+
 
   form = this.#fb.group({
     email: ['', [Validators.required, Validators.email]],
@@ -30,6 +32,7 @@ export class LoginComponent implements OnInit {
   ngOnInit() {
     this.#route.queryParams.subscribe(params => {
       this.error.set(params['error'] || null);
+      this.returnUrl = params['returnUrl'] || this.returnUrl;
     });
 
     this.form.valueChanges.subscribe(() => {
@@ -53,8 +56,7 @@ export class LoginComponent implements OnInit {
         next: (response) => {
           if (response) {
             this.#authStore.saveSession(response.user, response.token);
-            const returnUrl = this.#route.snapshot.queryParams['returnUrl'] || '/profile/me';
-            this.#router.navigateByUrl(returnUrl);
+            this.#router.navigateByUrl(this.returnUrl);
           }
         },
         error: (err: LoginError) => {
