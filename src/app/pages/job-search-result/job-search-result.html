@@ -1,0 +1,35 @@
+<div class="container">
+  <h1>Job Search Results</h1>
+
+  @if (isLoading()) {
+    <div class="loading">
+      <p>Loading jobs...</p>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="error">
+      <p>{{ error() }}</p>
+    </div>
+  }
+
+  @if (!isLoading() && !error() ) {
+    @if (jobs().length > 0) {
+    <div class="job-list">
+      @for (job of jobs(); track job.id) {
+        <div class="job-card">
+          <h2><a [routerLink]="['/jobs', job.id]">{{ job.title }}</a></h2>
+          <p><strong>Category:</strong> {{ job.category }}</p>
+          <p><strong>Budget:</strong> ${{ job.budget }}</p>
+          <p><strong>Status:</strong> {{ job.status }}</p>
+          <a [routerLink]="['/jobs', job.id]" class="details-button">View Details</a>
+        </div>
+      }
+    </div>
+    } @else {
+    <div class="no-results">
+      <p>No jobs found matching your criteria.</p>
+    </div>
+    }
+  }
+</div>
