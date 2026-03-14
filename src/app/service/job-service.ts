@@ -12,6 +12,7 @@ export interface Job {
   title: string;
   description: string;
   budget: number;
+  category: string;
   status: JobStatus;
 }
 
