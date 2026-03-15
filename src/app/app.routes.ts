@@ -4,6 +4,7 @@ import { RegisterComponent } from './pages/register/register';
 import { Profile } from './pages/profile/profile';
 import { needAuthGuard } from './guard/need-auth-guard';
 import { JobSearchResult } from './pages/job-search-result/job-search-result';
+import { JobSearchForm } from './pages/job-search-form/job-search-form';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -11,7 +12,8 @@ export const routes: Routes = [
   // `/profile/me` needs to be before `/profile/:username` since it would look for a user with me as a username
   { path: 'profile/me', component: Profile, canActivate: [needAuthGuard] }, 
   { path: 'profile/:username', component: Profile },
-  { path: 'jobs/search', component: JobSearchResult },
+  { path: 'jobs/search-result', component: JobSearchResult },
+  { path: 'jobs/search', component: JobSearchForm },
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: '**', redirectTo: '/login' }
 ];

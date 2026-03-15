@@ -1,1 +1,27 @@
-<p>job-search-form works!</p>
+<div class="container">
+  <h1>Search for Jobs</h1>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="status">Status</label>
+      <select id="status" formControlName="status">
+        <option value="open">Open</option>
+        <option value="in_progress">In Progress</option>
+        <option value="completed">Completed</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="category">Category</label>
+      <input type="text" id="category" formControlName="category" />
+    </div>
+    <div class="form-group">
+      <label for="min_budget">Minimum Budget</label>
+      <input type="number" id="min_budget" formControlName="min_budget" />
+      @if (form.get('min_budget')?.hasError('min')) {
+        <div class="error">
+          Minimum budget must be a positive number.
+        </div>
+      }
+    </div>
+    <button type="submit" [disabled]="form.invalid">Search</button>
+  </form>
+</div>

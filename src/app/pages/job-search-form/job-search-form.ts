@@ -31,6 +31,6 @@ export class JobSearchForm {
       min_budget: this.form.value.min_budget || undefined,
     };
 
-    this.#router.navigate(['/jobs/search'], { queryParams });
+    this.#router.navigate(['/jobs/search-result'], { queryParams });
   }
 }
