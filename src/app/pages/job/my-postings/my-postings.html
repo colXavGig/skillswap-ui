@@ -1,0 +1,41 @@
+<div class="container">
+  <div class="page-header">
+    <h1>My Job Postings</h1>
+    <a routerLink="/jobs/create" class="btn btn-primary">+ Post a New Job</a>
+  </div>
+
+  @if (isLoading()) {
+    <p class="loading">Loading your postings...</p>
+  }
+
+  @if (error()) {
+    <p class="error-message">{{ error() }}</p>
+  }
+
+  @if (loaded() && !error()) {
+    @if (jobs().length === 0) {
+      <div class="empty-state">
+        <p>You haven't posted any jobs yet.</p>
+        <a routerLink="/jobs/create" class="btn btn-primary">Post your first job</a>
+      </div>
+    } @else {
+      <div class="job-list">
+        @for (job of jobs(); track job.id) {
+          <div class="job-card">
+            <div class="job-card-header">
+              <h2>
+                <a [routerLink]="['/jobs', job.id]">{{ job.title }}</a>
+              </h2>
+              <span class="status-badge status-{{ job.status }}">{{ job.status }}</span>
+            </div>
+            <div class="job-card-meta">
+              <span><strong>Category:</strong> {{ job.category }}</span>
+              <span><strong>Budget:</strong> ${{ job.budget }}</span>
+            </div>
+            <a [routerLink]="['/jobs', job.id]" class="details-link">View Details & Proposals →</a>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>
