@@ -1,6 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { Job, JobService, JobStatus } from '../../service/job-service';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MinBudgetError } from '../../service/job-errors';
 
 @Component({
@@ -12,33 +12,40 @@ import { MinBudgetError } from '../../service/job-errors';
 export class JobSearchResult {
   readonly #jobService = inject(JobService);
   readonly #route = inject(ActivatedRoute);
-  readonly #router = inject(Router);
 
   jobs = signal<Job[]>([]);
   error = signal<string | null>(null);
-  isLoading = computed(() => this.error() === null && this.jobs().length === 0);
+  loaded = signal(false);
+  isLoading = computed(() => !this.loaded() && this.error() === null);
 
   ngOnInit() {
     const pathQueryParams = this.#route.snapshot.queryParams;
 
-    const status: JobStatus = pathQueryParams['status'] || 'open';
-    const category = pathQueryParams['category'] || undefined;
-    const min_budget = pathQueryParams['min_budget'] || undefined;
+    const statusParam = pathQueryParams['status'];
+    const status: JobStatus = statusParam === 'in_progress' || statusParam === 'completed' || statusParam === 'open'
+      ? statusParam
+      : 'open';
+    const category = typeof pathQueryParams['category'] === 'string' && pathQueryParams['category'].trim().length > 0
+      ? pathQueryParams['category'].trim()
+      : undefined;
+    const minBudgetParam = pathQueryParams['min_budget'];
+    const min_budget = minBudgetParam === undefined || minBudgetParam === null || minBudgetParam === ''
+      ? undefined
+      : Number(minBudgetParam);
 
     this.#jobService.searchJobs({ status, category, min_budget })
     .subscribe({
       next: (jobs) => {
         this.jobs.set(jobs);
+        this.loaded.set(true);
       },
       error: (err) => {
-        switch (err) {
-          case MinBudgetError: 
-            this.error.set(`Resquested minimum budget is invalid: ${min_budget || 'none provided'}}`)
-            break;
-          default:
-            this.error.set('An unknown error occurred');
-            break;
+        if (err instanceof MinBudgetError) {
+          this.error.set(`Requested minimum budget is invalid: ${minBudgetParam || 'none provided'}.`);
+        } else {
+          this.error.set('An unknown error occurred');
         }
+        this.loaded.set(true);
       }
     });
   }
