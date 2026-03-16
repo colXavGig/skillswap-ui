@@ -4,7 +4,7 @@ import { catchError, Observable, throwError } from 'rxjs';
 import { UserNotFoundError } from './user-errors';
 
 export interface User {
-  id: number;
+  id: string;
   name: string;
   username: string;
   email?: string;
