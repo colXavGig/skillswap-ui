@@ -6,10 +6,26 @@ import { AuthStore } from '../auth/auth-store';
 
 export type JobStatus = 'open' | 'in_progress' | 'completed';
 
+export interface JobOwner {
+  id: string;
+  name: string;
+  rating_avg: number;
+  username: string;
+}
+
+export interface JobFreelancer {
+  id: string;
+  name: string;
+  rating_avg: number;
+  username: string;
+}
+
 export interface Job {
-  id: number;
-  owner_id: number;
-  freelancer_id?: number;
+  id: string;
+  owner_id: string;
+  owner?: JobOwner;
+  freelancer_id: string | null;
+  freelancer?: JobFreelancer;
   title: string;
   description: string;
   budget: number;
@@ -41,7 +57,7 @@ export interface SearchJobsRequest {
 
 @Injectable({
   providedIn: 'root',
-}) 
+})
 export class JobService {
 
   readonly #BASE_ENDPOINT = '/jobs';
@@ -49,8 +65,8 @@ export class JobService {
   readonly #authStore = inject(AuthStore);
 
   /**
-   * 
-   * @param {SearchJobsRequest} queryParams 
+   *
+   * @param {SearchJobsRequest} queryParams
    * @throws {MinBudgetError}
    * @returns {Observable<Job[]>}
    */
@@ -87,7 +103,7 @@ export class JobService {
     );
   }
 
-  getJobById(id: number): Observable<Job> {
+  getJobById(id: string): Observable<Job> {
     if (!this.#authStore.isAuthentificated()) {
       return NEVER;
     }
@@ -103,7 +119,7 @@ export class JobService {
     );
   }
 
-  update(id: number, patch: UpdateJobRequest): Observable<void> {
+  update(id: string, patch: UpdateJobRequest): Observable<void> {
     if (!this.#authStore.isAuthentificated()) {
       return NEVER;
     }
@@ -115,17 +131,17 @@ export class JobService {
           case 400:
             if (err.error === 'Invalid status') {
               throw new InvalidStatusError(err.error);
-            } 
+            }
             if (err.error === 'No valid fields to update') {
               throw new NoValidFieldsToUpdateError(err.error);
             }
-            throw err;
+            return throwError(() => err);
           case 403: // connected user is not the owner
             throw new JobAccessForbiddenError(err.error);
           case 404:
             throw new JobNotFoundError(err.error);
           default:
-            throw err;
+            return throwError(() => err);
         }
       })
     );
@@ -140,7 +156,7 @@ export class JobService {
     return this.#apiClient.get<Job[]>(`${this.#BASE_ENDPOINT}/my-postings`)
   }
 
-  complete(job_id: number): Observable<void> {
+  complete(job_id: string): Observable<void> {
     if (!this.#authStore.isAuthentificated()) {
       return NEVER;
     }
@@ -149,14 +165,14 @@ export class JobService {
     .pipe(
       catchError((err: ApiError) => {
         switch (err.status) {
-          case 400: 
+          case 400:
             throw new MustBeInProgressError(err.error);
           case 403:
             throw new JobAccessForbiddenError(err.error);
           case 404:
             throw new JobNotFoundError(err.error);
           default:
-            throw err;
+            return throwError(() => err);
         }
       })
     );
