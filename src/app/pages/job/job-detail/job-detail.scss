@@ -1,0 +1,236 @@
+:host {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem;
+  min-height: 100vh;
+  background-color: #f4f7f9;
+}
+
+.page-container {
+  width: 100%;
+  max-width: 800px;
+}
+
+.loading,
+.error-message {
+  text-align: center;
+  font-size: 1.2rem;
+  padding: 3rem;
+  color: #555;
+}
+
+.error-message {
+  color: #d9534f;
+}
+
+.success-message {
+  color: #28a745;
+  margin-top: 0.5rem;
+}
+
+.job-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  border: 1px solid #e9ecef;
+}
+
+.job-header {
+  padding: 2rem;
+  background: linear-gradient(45deg, #007bff, #0056b3);
+  color: white;
+
+  .header-top {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+
+  h1 {
+    margin: 0 0 0.5rem;
+    font-size: 1.8rem;
+    font-weight: 600;
+  }
+
+  .budget {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 500;
+    opacity: 0.9;
+  }
+}
+
+.status-badge,
+.category-badge {
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge {
+  &.status-open {
+    background-color: #28a745;
+    color: white;
+  }
+  &.status-in_progress {
+    background-color: #ffc107;
+    color: #333;
+  }
+  &.status-completed {
+    background-color: #6c757d;
+    color: white;
+  }
+}
+
+.category-badge {
+  background-color: rgba(255, 255, 255, 0.25);
+  color: white;
+}
+
+.job-body {
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #e9ecef;
+
+  h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #343a40;
+    margin-bottom: 0.75rem;
+  }
+
+  p {
+    color: #495057;
+    line-height: 1.7;
+    white-space: pre-wrap;
+  }
+}
+
+.section {
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #e9ecef;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #343a40;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #007bff;
+  }
+}
+
+.form-group {
+  margin-bottom: 1rem;
+
+  label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-weight: 500;
+    color: #343a40;
+
+    .optional {
+      font-weight: 400;
+      color: #6c757d;
+      font-size: 0.85rem;
+    }
+  }
+
+  input,
+  textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    box-sizing: border-box;
+    resize: vertical;
+  }
+}
+
+.btn {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: opacity 0.2s;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &.btn-primary {
+    background-color: #007bff;
+    color: white;
+    &:hover:not(:disabled) { opacity: 0.85; }
+  }
+
+  &.btn-success {
+    background-color: #28a745;
+    color: white;
+    &:hover:not(:disabled) { opacity: 0.85; }
+  }
+}
+
+.empty-state {
+  color: #6c757d;
+  font-style: italic;
+}
+
+.proposal-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.proposal-item {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 1rem;
+
+  .proposal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .proposal-price {
+    font-size: 1.2rem;
+    color: #007bff;
+  }
+
+  .proposal-status {
+    padding: 0.25rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: capitalize;
+
+    &.status-pending { background-color: #fff3cd; color: #856404; }
+    &.status-accepted { background-color: #d4edda; color: #155724; }
+    &.status-rejected { background-color: #f8d7da; color: #721c24; }
+  }
+
+  .proposal-letter {
+    color: #495057;
+    line-height: 1.6;
+    margin-bottom: 0.75rem;
+  }
+}

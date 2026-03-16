@@ -1,0 +1,143 @@
+<div class="page-container">
+
+  @if (isLoading()) {
+    <p class="loading">Loading job details...</p>
+  }
+
+  @if (error()) {
+    <p class="error-message">{{ error() }}</p>
+  }
+
+  @if (job(); as j) {
+    <div class="job-card">
+
+      <header class="job-header">
+        <div class="header-top">
+          <span class="status-badge status-{{ j.status }}">{{ j.status | titlecase }}</span>
+          <span class="category-badge">{{ j.category }}</span>
+        </div>
+        <h1>{{ j.title }}</h1>
+        <p class="budget">${{ j.budget }}</p>
+      </header>
+
+      <section class="job-body">
+        <h2>Description</h2>
+        <p>{{ j.description }}</p>
+      </section>
+
+      <!-- ── OWNER SECTION ── -->
+      @if (isOwner()) {
+
+        <!-- Complete job button (in_progress only) -->
+        @if (j.status === 'in_progress') {
+          <section class="section">
+            <h2>Job Progress</h2>
+            <button class="btn btn-success" (click)="completeJob()">Mark as Completed</button>
+            @if (completeSuccess()) {
+              <p class="success-message">{{ completeSuccess() }}</p>
+            }
+            @if (completeError()) {
+              <p class="error-message">{{ completeError() }}</p>
+            }
+          </section>
+        }
+
+        <!-- Proposals list -->
+        <section class="section">
+          <h2>Proposals ({{ proposals().length }})</h2>
+          @if (acceptError()) {
+            <p class="error-message">{{ acceptError() }}</p>
+          }
+          @if (proposals().length === 0) {
+            <p class="empty-state">No proposals yet.</p>
+          } @else {
+            <ul class="proposal-list">
+              @for (proposal of proposals(); track proposal.id) {
+                <li class="proposal-item">
+                  <div class="proposal-header">
+                    <strong class="proposal-price">${{ proposal.price }}</strong>
+                    <span class="proposal-status status-{{ proposal.status }}">{{ proposal.status }}</span>
+                  </div>
+                  <p class="proposal-letter">{{ proposal.cover_letter }}</p>
+                  @if (proposal.status === 'pending' && j.status === 'open') {
+                    <button class="btn btn-primary" (click)="acceptProposal(proposal)">Accept</button>
+                  }
+                </li>
+              }
+            </ul>
+          }
+        </section>
+      }
+
+      <!-- ── FREELANCER SECTION: Submit proposal ── -->
+      @if (!isOwner() && isAuthenticated && j.status === 'open') {
+        <section class="section">
+          <h2>Submit a Proposal</h2>
+          <form [formGroup]="proposalForm" (ngSubmit)="submitProposal()">
+            <div class="form-group">
+              <label for="price">Your Price ($)</label>
+              <input id="price" type="number" formControlName="price" placeholder="Your price">
+            </div>
+            <div class="form-group">
+              <label for="cover_letter">Cover Letter</label>
+              <textarea id="cover_letter" formControlName="cover_letter" rows="4"
+                placeholder="Tell the client why you're the best fit for this job..."></textarea>
+            </div>
+            @if (proposalError()) {
+              <p class="error-message">{{ proposalError() }}</p>
+            }
+            @if (proposalSuccess()) {
+              <p class="success-message">{{ proposalSuccess() }}</p>
+            }
+            <button type="submit" class="btn btn-primary" [disabled]="proposalForm.invalid">
+              Submit Proposal
+            </button>
+          </form>
+        </section>
+      }
+
+      <!-- ── ASSIGNED FREELANCER: Complete job ── -->
+      @if (isAssignedFreelancer() && j.status === 'in_progress') {
+        <section class="section">
+          <h2>Job Progress</h2>
+          <button class="btn btn-success" (click)="completeJob()">Mark as Completed</button>
+          @if (completeSuccess()) {
+            <p class="success-message">{{ completeSuccess() }}</p>
+          }
+          @if (completeError()) {
+            <p class="error-message">{{ completeError() }}</p>
+          }
+        </section>
+      }
+
+      <!-- ── REVIEW SECTION (both participants, completed jobs) ── -->
+      @if (isParticipant() && j.status === 'completed' && reviewTargetId()) {
+        <section class="section">
+          <h2>Leave a Review</h2>
+          <form [formGroup]="reviewForm" (ngSubmit)="submitReview()">
+            <div class="form-group">
+              <label for="rating">Rating (1–5)</label>
+              <input id="rating" type="number" formControlName="rating" min="1" max="5"
+                placeholder="Enter a rating from 1 to 5">
+            </div>
+            <div class="form-group">
+              <label for="comment">Comment <span class="optional">(optional)</span></label>
+              <textarea id="comment" formControlName="comment" rows="3"
+                placeholder="Share your experience working with this person..."></textarea>
+            </div>
+            @if (reviewError()) {
+              <p class="error-message">{{ reviewError() }}</p>
+            }
+            @if (reviewSuccess()) {
+              <p class="success-message">{{ reviewSuccess() }}</p>
+            }
+            <button type="submit" class="btn btn-primary" [disabled]="reviewForm.invalid">
+              Submit Review
+            </button>
+          </form>
+        </section>
+      }
+
+    </div>
+  }
+</div>
