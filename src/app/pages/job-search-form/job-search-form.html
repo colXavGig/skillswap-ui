@@ -1,5 +1,27 @@
 <div class="container">
   <h1>Search for Jobs</h1>
+  @if (stats(); as platformStats) {
+    <section class="stats-panel">
+      <h2>Platform Stats</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="label">Total Users</span>
+          <strong class="value">{{ platformStats.total_users }}</strong>
+        </div>
+        <div class="stat-card">
+          <span class="label">Active Jobs</span>
+          <strong class="value">{{ platformStats.active_jobs }}</strong>
+        </div>
+        <div class="stat-card">
+          <span class="label">Total Value Moved</span>
+          <strong class="value">{{ formatCurrencyForStats(platformStats.total_value_moved) }}</strong>
+        </div>
+      </div>
+    </section>
+  }
+  @if (statsError()) {
+    <p class="stats-error">{{ statsError() }}</p>
+  }
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
     <div class="form-group">
       <label for="status">Status</label>
