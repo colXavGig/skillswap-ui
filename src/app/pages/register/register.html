@@ -20,10 +20,16 @@
     <div class="form-group">
       <label for="bio">Bio</label>
       <textarea id="bio" formControlName="bio" placeholder="Tell us about yourself"></textarea>
+      @if (form.get('bio')?.touched && form.get('bio')?.hasError('required')) {
+        <small class="field-error">Bio is required.</small>
+      }
     </div>
     <div class="form-group">
       <label for="skills">Skills</label>
       <input id="skills" formControlName="skills" placeholder="Comma-separated skills (e.g., Angular, NodeJS, UX Design)">
+      @if (form.get('skills')?.touched && form.get('skills')?.hasError('required')) {
+        <small class="field-error">At least one skill is required.</small>
+      }
     </div>
 
     @if (error()) {

@@ -32,6 +32,12 @@
     text-align: center;
   }
 
+  .field-error {
+    color: #d9534f;
+    display: block;
+    margin-top: 0.35rem;
+  }
+
   button {
     width: 100%;
     padding: 0.75rem;
