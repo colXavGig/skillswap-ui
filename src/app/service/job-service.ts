@@ -9,6 +9,7 @@ export type JobStatus = 'open' | 'in_progress' | 'completed';
 export interface Job {
   id: number;
   owner_id: number;
+  freelancer_id?: number;
   title: string;
   description: string;
   budget: number;
