@@ -61,16 +61,12 @@ export class LoginComponent implements OnInit {
         },
         error: (err: LoginError) => {
           console.error(err);
-          switch (err.constructor) {
-            case InvalidCredentialsError:
-              this.error.set('Invalid email or password.');
-              break;
-            case LoginMissingFieldsError:
-              this.error.set('Please fill in all fields.');
-              break;
-            default:
-              this.error.set('An unknown error occurred.');
-              break;
+          if (err instanceof InvalidCredentialsError) {
+            this.error.set('Invalid email or password.');
+          } else if (err instanceof LoginMissingFieldsError) {
+            this.error.set('Please fill in all fields.');
+          } else {
+            this.error.set('An unknown error occurred.');
           }
         }
       });
