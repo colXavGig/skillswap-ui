@@ -38,7 +38,10 @@ export class ApiClient {
         );
     }
 
-    private handleError(error: HttpErrorResponse) {
+    private handleError = (error: HttpErrorResponse | ApiError) => {
+        if (error instanceof ApiError) {
+          return throwError(() => error);
+        }
         if (error.error instanceof ErrorEvent) {
             // A client-side or network error occurred. Handle it accordingly.
             console.error('An error occurred:', error.error.message);
@@ -60,11 +63,14 @@ export class ApiError extends Error implements ApiErrorResponse {
   suggested_username?: string;
 
 
-  constructor(resp: ApiErrorResponse, status: number) {
-    super(resp.error);
-    this.error = resp.error;
+  constructor(resp: ApiErrorResponse | string, status: number) {
+    const errorMsg = typeof resp === 'string' ? resp : resp.error;
+    super(errorMsg);
+    this.error = errorMsg;
     this.status = status;
-    this.suggested_username = (resp as any).suggested_username;
+    if (typeof resp === 'object' && resp !== null) {
+      this.suggested_username = (resp as any).suggested_username;
+    }
   }
 
 }
