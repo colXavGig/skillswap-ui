@@ -4,19 +4,48 @@
     <div class="form-group">
       <label for="title">Title</label>
       <input type="text" id="title" name="title" formControlName="title" required>
+      @if (form.get('title')?.touched && form.get('title')?.hasError('required')) {
+        <p class="field-error">Title is required.</p>
+      }
     </div>
     <div class="form-group">
       <label for="description">Description</label>
       <textarea id="description" name="description" formControlName="description" required></textarea>
+      @if (form.get('description')?.touched && form.get('description')?.hasError('required')) {
+        <p class="field-error">Description is required.</p>
+      }
     </div>
     <div class="form-group">
       <label for="budget">Budget</label>
       <input type="number" id="budget" name="budget" formControlName="budget" required>
+      @if (form.get('budget')?.touched && form.get('budget')?.hasError('required')) {
+        <p class="field-error">Budget is required.</p>
+      }
+      @if (form.get('budget')?.touched && form.get('budget')?.hasError('min')) {
+        <p class="field-error">Budget must be at least 1.</p>
+      }
     </div>
     <div class="form-group">
       <label for="category">Category</label>
       <input type="text" id="category" name="category" formControlName="category" required>
+      @if (form.get('category')?.touched && form.get('category')?.hasError('required')) {
+        <p class="field-error">Category is required.</p>
+      }
     </div>
-    <button type="submit">Create Job</button>
+    @if (errorMsg()) {
+      <p class="error-message">{{ errorMsg() }}</p>
+    }
+
+    @if (feedbackMsg()) {
+      <p class="success-message">{{ feedbackMsg() }}</p>
+    }
+
+    <button type="submit" [disabled]="form.invalid || isSubmitting()">
+      @if (isSubmitting()) {
+        Creating...
+      } @else {
+        Create Job
+      }
+    </button>
   </form>
 </div>
