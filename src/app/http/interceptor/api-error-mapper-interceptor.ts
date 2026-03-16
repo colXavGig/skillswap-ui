@@ -1,5 +1,5 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
-import { catchError } from 'rxjs';
+import { catchError, throwError } from 'rxjs';
 import { ApiError } from '../api-client';
 
 export const apiErrorMapperInterceptor: HttpInterceptorFn = (req, next) => {
@@ -7,7 +7,10 @@ export const apiErrorMapperInterceptor: HttpInterceptorFn = (req, next) => {
   .pipe(
     catchError((err: HttpErrorResponse) => {
       console.error(err);
-      throw new ApiError(err.error, err.status);
+      if (err instanceof ApiError) {
+        return throwError(() => err);
+      }
+      return throwError(() => new ApiError(err.error, err.status));
     })
   );
 };
