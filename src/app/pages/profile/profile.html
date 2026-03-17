@@ -40,6 +40,40 @@
           <span class="stat-label">Jobs Completed</span>
         </div>
       </footer>
+
+      <section class="reviews-section">
+        <h2>Reviews Received</h2>
+
+        @if (!reviewsLoaded()) {
+          <p class="reviews-loading">Loading reviews...</p>
+        }
+
+        @if (reviewsError()) {
+          <p class="error-message">{{ reviewsError() }}</p>
+        }
+
+        @if (reviewsLoaded() && !reviewsError()) {
+          @if (reviews().length === 0) {
+            <p class="reviews-empty">No reviews yet.</p>
+          } @else {
+            <ul class="reviews-list">
+              @for (review of reviews(); track review.id) {
+                <li class="review-card">
+                  <div class="review-header">
+                    <strong>Rating: {{ review.rating }}/5</strong>
+                    <a [routerLink]="['/jobs', review.job_id]" class="review-job">View Job</a>
+                  </div>
+                  @if (review.comment) {
+                    <p class="review-comment">{{ review.comment }}</p>
+                  } @else {
+                    <p class="review-comment review-comment-empty">No comment provided.</p>
+                  }
+                </li>
+              }
+            </ul>
+          }
+        }
+      </section>
     </div>
   }
 </div>
