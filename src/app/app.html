@@ -1,1 +1,17 @@
+<nav class="navbar">
+  <a class="navbar-brand" routerLink="/jobs/search">SkillSwap</a>
+  <ul class="navbar-links">
+    <li><a routerLink="/jobs/search">Browse Jobs</a></li>
+    @if (isAuthenticated) {
+      <li><a routerLink="/jobs/create">Post a Job</a></li>
+      <li><a routerLink="/jobs/my-postings">My Postings</a></li>
+      <li><a routerLink="/proposals/my-bids">My Bids</a></li>
+      <li><a routerLink="/profile/me">Profile</a></li>
+      <li><button class="logout-btn" (click)="logout()">Logout</button></li>
+    } @else {
+      <li><a routerLink="/login">Login</a></li>
+      <li><a routerLink="/register">Register</a></li>
+    }
+  </ul>
+</nav>
 <router-outlet></router-outlet>
