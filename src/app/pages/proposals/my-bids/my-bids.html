@@ -1,0 +1,56 @@
+<div class="container">
+  <h1>My Proposals</h1>
+
+  @if (isLoading()) {
+    <p class="loading">Loading your proposals...</p>
+  }
+
+  @if (error()) {
+    <p class="error-message">{{ error() }}</p>
+  }
+
+  @if (loaded() && !error()) {
+    @if (proposals().length === 0) {
+      <div class="empty-state">
+        <p>You haven't submitted any proposals yet.</p>
+        <a routerLink="/jobs/search" class="btn btn-primary">Browse open jobs</a>
+      </div>
+    } @else {
+      <ul class="bids-list">
+        @for (proposal of proposals(); track proposal.id) {
+          <li class="bid-card">
+            <div class="bid-header">
+              <div class="bid-job">
+                @if (proposal.job_title) {
+                  <a [routerLink]="['/jobs', proposal.job_id]" class="job-link">
+                    {{ proposal.job_title }}
+                  </a>
+                } @else {
+                  <a [routerLink]="['/jobs', proposal.job_id]" class="job-link">
+                    View Job
+                  </a>
+                }
+              </div>
+              <div class="bid-meta">
+                <strong class="bid-price">${{ proposal.price }}</strong>
+                <span class="status-badge status-{{ proposal.status }}">{{ proposal.status }}</span>
+              </div>
+            </div>
+
+            <p class="bid-letter">{{ proposal.cover_letter }}</p>
+
+            @if (deleteErrors()[proposal.id]) {
+              <p class="error-message">{{ deleteErrors()[proposal.id] }}</p>
+            }
+
+            @if (proposal.status === 'pending') {
+              <button class="btn btn-danger" (click)="deleteProposal(proposal)">
+                Withdraw Proposal
+              </button>
+            }
+          </li>
+        }
+      </ul>
+    }
+  }
+</div>
