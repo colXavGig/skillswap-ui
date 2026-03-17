@@ -1,9 +1,16 @@
+import { RouterLink } from '@angular/router';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Job, JobService } from '../../../service/job-service';
-import { JobNotFoundError, JobAccessForbiddenError, MustBeInProgressError } from '../../../service/job-errors';
+import { Job, JobService, JobStatus, UpdateJobRequest } from '../../../service/job-service';
+import {
+  InvalidStatusError,
+  JobAccessForbiddenError,
+  JobNotFoundError,
+  MustBeInProgressError,
+  NoValidFieldsToUpdateError,
+} from '../../../service/job-errors';
 import { Proposal, ProposalService } from '../../../service/proposal-service';
 import { ReviewService } from '../../../service/review-service';
 import { AuthStore } from '../../../auth/auth-store';
@@ -57,6 +64,17 @@ export class JobDetailComponent implements OnInit {
     return null;
   });
 
+  // Owner update form
+  updateForm = this.#fb.group({
+    title: ['', Validators.required],
+    description: ['', Validators.required],
+    budget: [null as number | null, [Validators.required, Validators.min(1)]],
+    category: ['', Validators.required],
+    status: ['open' as JobStatus, Validators.required],
+  });
+  updateError = signal<string | null>(null);
+  updateSuccess = signal<string | null>(null);
+
   // Proposal form (for freelancers)
   proposalForm = this.#fb.group({
     price: [null as number | null, [Validators.required, Validators.min(1)]],
@@ -81,20 +99,23 @@ export class JobDetailComponent implements OnInit {
   acceptError = signal<string | null>(null);
 
   ngOnInit() {
-    const idStr = this.#route.snapshot.paramMap.get('id');
-    const id = Number(idStr);
+    this.updateForm.valueChanges.subscribe(() => {
+      this.updateError.set(null);
+      this.updateSuccess.set(null);
+    });
 
-    if (!idStr || isNaN(id)) {
+    const jobId = this.getJobIdFromRoute();
+    if (!jobId) {
       this.error.set('Invalid job ID.');
       return;
     }
 
-    this.#jobService.getJobById(id).subscribe({
+    this.#jobService.getJobById(jobId).subscribe({
       next: (job) => {
-        this.job.set(job);
+        this.applyLoadedJob(job);
         // If owner, load proposals
         if (job.owner_id === this.currentUserId) {
-          this.#proposalService.getJobProposals(id).subscribe({
+          this.#proposalService.getJobProposals(jobId).subscribe({
             next: (proposals) => this.proposals.set(proposals),
             error: () => {}, // proposals list is non-critical
           });
@@ -110,9 +131,34 @@ export class JobDetailComponent implements OnInit {
     });
   }
 
+  private getJobIdFromRoute(): string | null {
+    const id = this.#route.snapshot.paramMap.get('id');
+    if (!id || id.trim().length === 0) {
+      return null;
+    }
+
+    return id;
+  }
+
+  private applyLoadedJob(job: Job) {
+    this.job.set(job);
+    this.updateForm.patchValue({
+      title: job.title,
+      description: job.description,
+      budget: job.budget,
+      category: job.category,
+      status: job.status,
+    });
+  }
+
   acceptProposal(proposal: Proposal) {
     this.acceptError.set(null);
-    const jobId = Number(this.#route.snapshot.paramMap.get('id'));
+    const jobId = this.getJobIdFromRoute();
+
+    if (!jobId) {
+      this.acceptError.set('Invalid job ID.');
+      return;
+    }
 
     this.#proposalService.acceptProposal(proposal.id).subscribe({
       next: () => {
@@ -128,7 +174,7 @@ export class JobDetailComponent implements OnInit {
         );
         // Reload job to get updated status and freelancer_id
         this.#jobService.getJobById(jobId).subscribe({
-          next: (job) => this.job.set(job),
+          next: (job) => this.applyLoadedJob(job),
           error: () => {},
         });
       },
@@ -143,7 +189,12 @@ export class JobDetailComponent implements OnInit {
     this.proposalError.set(null);
     this.proposalSuccess.set(null);
 
-    const jobId = Number(this.#route.snapshot.paramMap.get('id'));
+    const jobId = this.getJobIdFromRoute();
+    if (!jobId) {
+      this.proposalError.set('Invalid job ID.');
+      return;
+    }
+
     const { price, cover_letter } = this.proposalForm.value;
 
     this.#proposalService
@@ -167,15 +218,83 @@ export class JobDetailComponent implements OnInit {
       });
   }
 
+  updateJob() {
+    const currentJob = this.job();
+    if (!currentJob) {
+      return;
+    }
+
+    if (this.updateForm.invalid) {
+      this.updateForm.markAllAsTouched();
+      return;
+    }
+
+    this.updateError.set(null);
+    this.updateSuccess.set(null);
+
+    const { title, description, budget, category, status } = this.updateForm.getRawValue();
+    const normalizedTitle = title?.trim() || '';
+    const normalizedDescription = description?.trim() || '';
+    const normalizedCategory = category?.trim() || '';
+
+    const patch: UpdateJobRequest = {};
+    if (normalizedTitle !== currentJob.title) {
+      patch.title = normalizedTitle;
+    }
+    if (normalizedDescription !== currentJob.description) {
+      patch.description = normalizedDescription;
+    }
+    if (budget != null && budget !== currentJob.budget) {
+      patch.budget = budget;
+    }
+    if (normalizedCategory !== currentJob.category) {
+      patch.category = normalizedCategory;
+    }
+    if (status && status !== currentJob.status) {
+      patch.status = status;
+    }
+
+    if (Object.keys(patch).length === 0) {
+      this.updateError.set('No changes detected.');
+      return;
+    }
+
+    this.#jobService.update(currentJob.id, patch).subscribe({
+      next: () => {
+        this.updateSuccess.set('Job updated successfully.');
+        this.applyLoadedJob({ ...currentJob, ...patch });
+      },
+      error: (err) => {
+        if (err instanceof NoValidFieldsToUpdateError) {
+          this.updateError.set('No valid fields were provided for update.');
+        } else if (err instanceof InvalidStatusError) {
+          this.updateError.set('Selected status is invalid.');
+        } else if (err instanceof JobAccessForbiddenError) {
+          this.updateError.set('You are not allowed to update this job.');
+        } else {
+          this.updateError.set(err.message || 'Failed to update job.');
+        }
+      },
+    });
+  }
+
   completeJob() {
     this.completeError.set(null);
     this.completeSuccess.set(null);
-    const jobId = Number(this.#route.snapshot.paramMap.get('id'));
+    const jobId = this.getJobIdFromRoute();
+
+    if (!jobId) {
+      this.completeError.set('Invalid job ID.');
+      return;
+    }
 
     this.#jobService.complete(jobId).subscribe({
       next: () => {
         this.completeSuccess.set('Job marked as completed!');
-        this.job.update((j) => (j ? { ...j, status: 'completed' } : j));
+        const currentJob = this.job();
+        if (currentJob) {
+          this.applyLoadedJob({ ...currentJob, status: 'completed' });
+        }
       },
       error: (err) => {
         if (err instanceof MustBeInProgressError) {
@@ -194,9 +313,14 @@ export class JobDetailComponent implements OnInit {
     this.reviewError.set(null);
     this.reviewSuccess.set(null);
 
-    const jobId = Number(this.#route.snapshot.paramMap.get('id'));
+    const jobId = this.getJobIdFromRoute();
     const targetId = this.reviewTargetId();
     const { rating, comment } = this.reviewForm.value;
+
+    if (!jobId) {
+      this.reviewError.set('Invalid job ID.');
+      return;
+    }
 
     if (!targetId) {
       this.reviewError.set('Cannot determine review target.');
